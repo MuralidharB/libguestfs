@@ -205,7 +205,12 @@ add_drive_standard_params (guestfs_h *g, struct backend_direct_data *data,
 
     /* file= parameter. */
     file = guestfs_int_drive_source_qemu_param (g, &drv->src);
-    append_list_format ("file=%s", file);
+    if (strncmp(drv->secobject, "secret", strlen("secret")) == 0) {
+      append_list ("driver=qcow2");
+      append_list_format ("file.filename=%s", file);
+    } else {
+      append_list_format ("file=%s", file);
+    }
 
     if (drv->readonly)
       append_list ("snapshot=on");
@@ -215,6 +220,7 @@ add_drive_standard_params (guestfs_h *g, struct backend_direct_data *data,
       append_list_format ("format=%s", drv->src.format);
     if (drv->copyonread)
       append_list ("copy-on-read=on");
+    append_list("encrypt.key-secret=sec0");
 
     /* Discard mode. */
     switch (drv->discard) {
@@ -606,6 +612,11 @@ launch_direct (guestfs_h *g, void *datav, const char *arg)
       append_list ("rng=rng0");
     } end_list ();
   }
+  start_list ("--object") {
+    append_list ("secret");
+    append_list ("id=sec0");
+    append_list ("data=backing");
+  } end_list ();
 
   /* Create the virtio-scsi bus. */
   start_list ("-device") {

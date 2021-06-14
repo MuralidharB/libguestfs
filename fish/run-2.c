@@ -121,7 +121,7 @@ run_add_drive (const char *cmd, size_t argc, char *argv[])
   struct guestfs_add_drive_opts_argv *optargs = &optargs_s;
   size_t i = 0;
 
-  if (argc < 1 || argc > 14) {
+  if (argc < 1 || argc > 15) {
     ret = RUN_WRONG_ARGS;
     goto out_noargs;
   }
@@ -230,6 +230,11 @@ run_add_drive (const char *cmd, size_t argc, char *argv[])
       }
       this_mask = GUESTFS_ADD_DRIVE_OPTS_BLOCKSIZE_BITMASK;
       this_arg = "blocksize";
+    }
+    else if (STRPREFIX (argv[i], "object:")) {
+      optargs_s.secobject = &argv[i][strlen("object:")];
+      this_mask = GUESTFS_ADD_DRIVE_OPTS_OBJECT_BITMASK;
+      this_arg = "object";
     }
     else {
       fprintf (stderr, _("%s: unknown optional argument \"%s\"\n"),

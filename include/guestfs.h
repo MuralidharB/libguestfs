@@ -1032,6 +1032,8 @@ struct guestfs_add_drive_opts_argv {
   int copyonread;
 # define GUESTFS_ADD_DRIVE_OPTS_BLOCKSIZE_BITMASK (UINT64_C(1)<<12)
   int blocksize;
+# define GUESTFS_ADD_DRIVE_OPTS_OBJECT_BITMASK (UINT64_C(1)<<13)
+  const char *secobject;
 };
 
 extern GUESTFS_DLL_PUBLIC int guestfs_add_drive_opts_argv (guestfs_h *g, const char *filename, const struct guestfs_add_drive_opts_argv *optargs);

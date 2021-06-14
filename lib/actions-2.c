@@ -125,7 +125,14 @@ guestfs_add_drive_opts_argv (guestfs_h *g,
     return -1;
   }
 
-  if (optargs->bitmask & UINT64_C(0xffffffffffffe000)) {
+  if ((optargs->bitmask & GUESTFS_ADD_DRIVE_OPTS_OBJECT_BITMASK) &&
+      optargs->secobject == NULL) {
+    error (g, "%s: %s: optional parameter cannot be NULL",
+           "add_drive_opts", "object");
+    return -1;
+  }
+
+  if (optargs->bitmask & UINT64_C(0xffffffffffffd000)) {
     error (g, "%s: unknown option in guestfs_%s_argv->bitmask (this can happen if a program is compiled against a newer version of libguestfs, then dynamically linked to an older version)",
            "add_drive_opts", "add_drive_opts");
     return -1;
