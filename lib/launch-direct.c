@@ -202,12 +202,18 @@ add_drive_standard_params (guestfs_h *g, struct backend_direct_data *data,
 {
   if (!drv->overlay) {
     CLEANUP_FREE char *file = NULL;
+    CLEANUP_FREE char *token = NULL;
 
     /* file= parameter. */
     file = guestfs_int_drive_source_qemu_param (g, &drv->src);
     if (strncmp(drv->secobject, "secret", strlen("secret")) == 0) {
-      append_list ("driver=qcow2");
-      append_list_format ("file.filename=%s", file);
+      /* get the first token */
+      token = strtok(file, ",");
+      /* walk through other tokens */
+      while ( token != NULL ) {
+        append_list(token);
+        token = strtok(NULL, ",");
+      }
     } else {
       append_list_format ("file=%s", file);
     }
@@ -220,7 +226,6 @@ add_drive_standard_params (guestfs_h *g, struct backend_direct_data *data,
       append_list_format ("format=%s", drv->src.format);
     if (drv->copyonread)
       append_list ("copy-on-read=on");
-    append_list("encrypt.key-secret=sec0");
 
     /* Discard mode. */
     switch (drv->discard) {

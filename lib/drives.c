@@ -888,7 +888,9 @@ guestfs_impl_add_drive_opts (guestfs_h *g, const char *filename,
       /* We have to check for the existence of the file since that's
        * required by the API.
        */
-      char *fptr, *tmp;
+      char *fptr;
+      char *tmp;
+      char *filesubstr;
 
       if ((fptr = strstr(filename, "file.filename=")) == NULL) {
         if (access (filename, R_OK) == -1) {
@@ -897,13 +899,11 @@ guestfs_impl_add_drive_opts (guestfs_h *g, const char *filename,
         }
       } else {
         fptr += strlen("file.filename=");
-	tmp = strtok(fptr, ",");
+        filesubstr = safe_strdup (g, fptr);
+	tmp = strtok(filesubstr, ",");
         if (access (tmp, R_OK) == -1) {
           perrorf (g, "%s", filename);
           return -1;
-        }
-	while( tmp != NULL ) {
-          tmp = strtok(NULL, ",");
         }
       }
       drv = create_drive_file (g, &data);
